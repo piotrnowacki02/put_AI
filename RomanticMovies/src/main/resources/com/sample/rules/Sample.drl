@@ -1,0 +1,1189 @@
+package com.sample.rules
+ 
+import com.sample.DroolsTest;
+import com.sample.Gui;
+import java.util.ArrayList;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Map;
+import java.util.HashMap;
+import java.io.BufferedReader;
+
+declare QuestionHashMap
+    key: String
+    val: String
+end
+
+declare Question
+    question: String
+    answers_to_question: HashMap
+    answer: String
+end
+
+
+
+rule "Init"
+when
+then
+    BufferedReader questionReader = new BufferedReader(new FileReader("questions.txt"));
+    BufferedReader answerReader = new BufferedReader(new FileReader("answers.txt"));
+    BufferedReader questionAnswerReader = new BufferedReader(new FileReader("questions_answers_map.txt"));
+
+    String qLine;
+    while ((qLine = questionReader.readLine()) != null) {
+        String[] parts = qLine.split(";");
+        String key = parts[0].trim();
+        String value = parts[1].trim();
+        insert(new QuestionHashMap(key, value));
+    }
+
+	HashMap<String, String> answerMap = new HashMap<String, String>();
+    String aLine;
+    while ((aLine = answerReader.readLine()) != null) {
+        String[] parts = aLine.split(";");
+        String key = parts[0].trim();
+        String value = parts[1].trim();
+        answerMap.put(key, value);
+    }
+
+    while ((qLine = questionAnswerReader.readLine()) != null) {
+        String[] parts = qLine.split(";");
+        String q = parts[0].trim();
+        int value = Integer.parseInt(parts[1].trim()) + 2;
+        HashMap<String, String> answers = new HashMap<String, String>();
+        for (int i = 2; i < value; i++) {
+            String answerKey = parts[i].trim();
+        	String answerValue = answerMap.get(answerKey);
+        	answers.put(answerKey, answerValue);
+        }
+        insert(new Question(q, answers, null));
+    }
+
+    questionReader.close();
+    answerReader.close();
+    questionAnswerReader.close();
+end
+
+rule "Watching with who"
+when
+    q: Question(question == "QUESTION_WITH_WHO", $list: answers_to_question, answer == null)
+    c: QuestionHashMap(key == "QUESTION_WITH_WHO", $val: val)
+then
+    String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    q.setAnswer(result);
+    update(q);
+end
+
+rule "Family"
+when
+	q: Question(question == "QUESTION_WITH_WHO", answer == "ANSWER_FAMILY")
+    c: QuestionHashMap(key == "QUESTION_ANIMATION", $val: val)
+    toAsk: Question(question == "QUESTION_ANIMATION", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Animation? no"
+when
+	q: Question(question == "QUESTION_ANIMATION", answer == "ANSWER_NO")
+    c: QuestionHashMap(key == "QUESTION_HOLIDAYS", $val: val)
+    toAsk: Question(question == "QUESTION_HOLIDAYS", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Kid or teens"
+when
+	q: Question(question == "QUESTION_HOLIDAYS", answer == "ANSWER_NO_HOLIDAY")
+    c: QuestionHashMap(key == "QUESTION_AGE_GROUP", $val: val)
+    toAsk: Question(question == "QUESTION_AGE_GROUP", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "What century?"
+when
+	q: Question(question == "QUESTION_AGE_GROUP", answer == "ANSWER_TEENS")
+    c: QuestionHashMap(key == "QUESTION_STORY_TIME", $val: val)
+    toAsk: Question(question == "QUESTION_STORY_TIME", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "High school?"
+when
+	q: Question(question == "QUESTION_STORY_TIME", answer == "ANSWER_EYE_ROLL")
+    c: QuestionHashMap(key == "QUESTION_HIGH_SCHOOL", $val: val)
+    toAsk: Question(question == "QUESTION_HIGH_SCHOOL", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Do they like musicals?"
+when
+	q: Question(question == "QUESTION_HIGH_SCHOOL", answer == "ANSWER_PASS_HIGH_SCHOOL")
+    c: QuestionHashMap(key == "QUESTION_MUSICALS", $val: val)
+    toAsk: Question(question == "QUESTION_MUSICALS", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Von trapp"
+when
+	q: Question(question == "QUESTION_MUSICALS", answer == "ANSWER_VON_TRAPP")
+    c: QuestionHashMap(key == "RESULT_MAMMA_MIA", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Musicals? no"
+when
+	q: Question(question == "QUESTION_MUSICALS", answer == "ANSWER_NO_MUSICALS")
+    c: QuestionHashMap(key == "QUESTION_AVOID_LOVE_SCENES", $val: val)
+    toAsk: Question(question == "QUESTION_AVOID_LOVE_SCENES", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Avoid kiss? yes"
+when
+	q: Question(question == "QUESTION_AVOID_LOVE_SCENES", answer == "ANSWER_NO_KISS")
+    c: QuestionHashMap(key == "RESULT_MEET_THE_PARENTS", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Avoid kiss? a kiss wont kill anyone"
+when
+	q: Question(question == "QUESTION_AVOID_LOVE_SCENES", answer == "ANSWER_OK_KISS")
+    c: QuestionHashMap(key == "RESULT_JUNO", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "High school? could work"
+when
+	q: Question(question == "QUESTION_HIGH_SCHOOL", answer == "ANSWER_COULD_WORK")
+    c: QuestionHashMap(key == "RESULT_10_THINGS_I_HATE_ABOUT_YOU", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Century? Lets teach them"
+when
+	q: Question(question == "QUESTION_STORY_TIME", answer == "ANSWER_TEACH")
+    c: QuestionHashMap(key == "RESULT_THE_PHILADELPHIA_STORY", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Age group? kids"
+when
+	q: Question(question == "QUESTION_AGE_GROUP", answer == "ANSWER_KIDDIES")
+    c: QuestionHashMap(key == "QUESTION_PRINCESS_MOVIE", $val: val)
+    toAsk: Question(question == "QUESTION_PRINCESS_MOVIE", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Princess? barf"
+when
+	q: Question(question == "QUESTION_PRINCESS_MOVIE", answer == "ANSWER_BARF")
+    c: QuestionHashMap(key == "RESULT_MOONRISE_KINGDOM", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Princess? yes"
+when
+	q: Question(question == "QUESTION_PRINCESS_MOVIE", answer == "ANSWER_GIRLS")
+    c: QuestionHashMap(key == "RESULT_ENCHANTED", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Princess? gender neutral"
+when
+	q: Question(question == "QUESTION_PRINCESS_MOVIE", answer == "ANSWER_NEUTRAL")
+    c: QuestionHashMap(key == "RESULT_PRINCESS_BRIDE", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Christmas? yes, everyday"
+when
+	q: Question(question == "QUESTION_HOLIDAYS", answer == "ANSWER_CHRISTMAS")
+    c: QuestionHashMap(key == "QUESTION_BLACK_WHITE", $val: val)
+    toAsk: Question(question == "QUESTION_BLACK_WHITE", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Black and white? classics"
+when
+	q: Question(question == "QUESTION_BLACK_WHITE", answer == "ANSWER_CLASSICS")
+    c: QuestionHashMap(key == "RESULT_IT'S_A_WONDERFUL_LIFE", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Black and white? no"
+when
+	q: Question(question == "QUESTION_BLACK_WHITE", answer == "ANSWER_MODERN")
+    c: QuestionHashMap(key == "QUESTION_LOVE_TRIANGLES", $val: val)
+    toAsk: Question(question == "QUESTION_LOVE_TRIANGLES", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Love Triangles? no"
+when
+	q: Question(question == "QUESTION_LOVE_TRIANGLES", answer == "ANSWER_NO_COMPLEXITY")
+    c: QuestionHashMap(key == "RESULT_THE_HOLIDAY", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Love Triangles? yes"
+when
+	q: Question(question == "QUESTION_LOVE_TRIANGLES", answer == "ANSWER_COMPLEX")
+    c: QuestionHashMap(key == "RESULT_LOVE_ACTUALLY", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Animation? yes"
+when
+	q: Question(question == "QUESTION_ANIMATION", answer == "ANSWER_YES")
+    c: QuestionHashMap(key == "QUESTION_PIXAR_DISNEY", $val: val)
+    toAsk: Question(question == "QUESTION_PIXAR_DISNEY", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Disney"
+when
+	q: Question(question == "QUESTION_PIXAR_DISNEY", answer == "ANSWER_DISNEY")
+    c: QuestionHashMap(key == "QUESTION_LOVER_FIGHTER", $val: val)
+    toAsk: Question(question == "QUESTION_LOVER_FIGHTER", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Disney lover"
+when
+	q: Question(question == "QUESTION_LOVER_FIGHTER", answer == "ANSWER_LOVER")
+    c: QuestionHashMap(key == "RESULT_BEAUTY_AND_THE_BEAST", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Disney fighter"
+when
+	q: Question(question == "QUESTION_LOVER_FIGHTER", answer == "ANSWER_FIGHTER")
+    c: QuestionHashMap(key == "RESULT_TANGLED", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Pixar"
+when
+	q: Question(question == "QUESTION_PIXAR_DISNEY", answer == "ANSWER_PIXAR")
+    c: QuestionHashMap(key == "QUESTION_ROBOTS_HUMANS", $val: val)
+    toAsk: Question(question == "QUESTION_ROBOTS_HUMANS", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Pixar robots"
+when
+	q: Question(question == "QUESTION_ROBOTS_HUMANS", answer == "ANSWER_ROBOTS")
+    c: QuestionHashMap(key == "RESULT_WALL-E", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Pixar humans"
+when
+	q: Question(question == "QUESTION_ROBOTS_HUMANS", answer == "ANSWER_HUMANS")
+    c: QuestionHashMap(key == "RESULT_UP", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Burton"
+when
+	q: Question(question == "QUESTION_PIXAR_DISNEY", answer == "ANSWER_BURTON")
+    c: QuestionHashMap(key == "RESULT_NIGHTMARE_BEFORE_CHRISTMAS", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Girlfriends"
+when
+	q: Question(question == "QUESTION_WITH_WHO", answer == "ANSWER_GIRLFREINDS")
+    c: QuestionHashMap(key == "QUESTION_BREAKUP", $val: val)
+    toAsk: Question(question == "QUESTION_BREAKUP", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Lets avoid the heartache"
+when
+	q: Question(question == "QUESTION_BREAKUP", answer == "ANSWER_NO_HEARTACHE")
+    c: QuestionHashMap(key == "QUESTION_HUNKY_MALE", $val: val)
+    toAsk: Question(question == "QUESTION_HUNKY_MALE", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "hunky man"
+when
+	q: Question(question == "QUESTION_HUNKY_MALE", answer == "ANSWER_HUNKY_YES")
+    c: QuestionHashMap(key == "QUESTION_RYAN_GOSLING", $val: val)
+    toAsk: Question(question == "QUESTION_RYAN_GOSLING", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "mystery man"
+when
+	q: Question(question == "QUESTION_HUNKY_MALE", answer == "ANSWER_MYSTERY_MAN")
+    c: QuestionHashMap(key == "QUESTION_TIM_BURTON", $val: val)
+    toAsk: Question(question == "QUESTION_TIM_BURTON", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "mystery burton"
+when
+	q: Question(question == "QUESTION_TIM_BURTON", answer == "ANSWER_BURTON_YES")
+    c: QuestionHashMap(key == "RESULT_EDWARD_SCISSORHANDS", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "mystery no burton"
+when
+	q: Question(question == "QUESTION_TIM_BURTON", answer == "ANSWER_BURTON_NO")
+    c: QuestionHashMap(key == "QUESTION_THIEVES", $val: val)
+    toAsk: Question(question == "QUESTION_THIEVES", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "thieves? no"
+when
+	q: Question(question == "QUESTION_THIEVES", answer == "ANSWER_NO_CRIMINAL")
+    c: QuestionHashMap(key == "RESULT_GONE_WITH_THE_WIND", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "thieves? yes"
+when
+	q: Question(question == "QUESTION_THIEVES", answer == "ANSWER_DANGER")
+    c: QuestionHashMap(key == "QUESTION_INTERNATIONAL_THIEVES", $val: val)
+    toAsk: Question(question == "QUESTION_INTERNATIONAL_THIEVES", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "international thieves"
+when
+	q: Question(question == "QUESTION_INTERNATIONAL_THIEVES", answer == "ANSWER_INTERNATIONAL")
+    c: QuestionHashMap(key == "RESULT_FRENCH_KISS", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "american thieves"
+when
+	q: Question(question == "QUESTION_INTERNATIONAL_THIEVES", answer == "ANSWER_AMERICA")
+    c: QuestionHashMap(key == "QUESTION_VEGAS_NYC", $val: val)
+    toAsk: Question(question == "QUESTION_VEGAS_NYC", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "vegas"
+when
+	q: Question(question == "QUESTION_VEGAS_NYC", answer == "ANSWER_VEGAS")
+    c: QuestionHashMap(key == "RESULT_OCEANS'S_ELEVEN", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "nyc"
+when
+	q: Question(question == "QUESTION_VEGAS_NYC", answer == "ANSWER_NYC")
+    c: QuestionHashMap(key == "RESULT_THE_THOMAS_CROWN_AFFAIR", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Gosling yes"
+when
+	q: Question(question == "QUESTION_RYAN_GOSLING", answer == "ANSWER_GOSLING_YES")
+    c: QuestionHashMap(key == "QUESTION_GOSLING_IN_LOVE", $val: val)
+    toAsk: Question(question == "QUESTION_GOSLING_IN_LOVE", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Gosling no"
+when
+	q: Question(question == "QUESTION_RYAN_GOSLING", answer == "ANSWER_GOSLING_NO")
+    c: QuestionHashMap(key == "QUESTION_HUNKS", $val: val)
+    toAsk: Question(question == "QUESTION_HUNKS", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "indie"
+when
+	q: Question(question == "QUESTION_HUNKS", answer == "ANSWER_INDIE")
+    c: QuestionHashMap(key == "RESULT_500_DAYS_OF_SUMMER", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "classic hunk"
+when
+	q: Question(question == "QUESTION_HUNKS", answer == "ANSWER_CLASSIC_HUNK")
+    c: QuestionHashMap(key == "QUESTION_TOM_CRUISE", $val: val)
+    toAsk: Question(question == "QUESTION_TOM_CRUISE", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Tom Cruise? no"
+when
+	q: Question(question == "QUESTION_TOM_CRUISE", answer == "ANSWER_TOM_NO")
+    c: QuestionHashMap(key == "QUESTION_DANCE", $val: val)
+    toAsk: Question(question == "QUESTION_DANCE", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Dance? no"
+when
+	q: Question(question == "QUESTION_DANCE", answer == "ANSWER_SINGER")
+    c: QuestionHashMap(key == "RESULT_GREASE", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Dance? yes"
+when
+	q: Question(question == "QUESTION_DANCE", answer == "ANSWER_MOVES")
+    c: QuestionHashMap(key == "QUESTION_SWAYZE_BACON", $val: val)
+    toAsk: Question(question == "QUESTION_SWAYZE_BACON", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Swayze"
+when
+	q: Question(question == "QUESTION_SWAYZE_BACON", answer == "ANSWER_SWAYZE")
+    c: QuestionHashMap(key == "RESULT_DIRTY_DANCING", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Bacon"
+when
+	q: Question(question == "QUESTION_SWAYZE_BACON", answer == "ANSWER_BACON")
+    c: QuestionHashMap(key == "RESULT_FOOTLOOSE", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Tom Cruise? yes"
+when
+	q: Question(question == "QUESTION_TOM_CRUISE", answer == "ANSWER_TOM_YES")
+    c: QuestionHashMap(key == "QUESTION_90S_80S_TOM", $val: val)
+    toAsk: Question(question == "QUESTION_90S_80S_TOM", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "80s Tom"
+when
+	q: Question(question == "QUESTION_90S_80S_TOM", answer == "ANSWER_TOM_80S")
+    c: QuestionHashMap(key == "RESULT_COCKTAIL", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "90s Tom"
+when
+	q: Question(question == "QUESTION_90S_80S_TOM", answer == "ANSWER_TOM_90S")
+    c: QuestionHashMap(key == "RESULT_JERRY_MAGUIRE", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Gosling in love? no"
+when
+	q: Question(question == "QUESTION_GOSLING_IN_LOVE", answer == "ANSWER_GOSLING_ME")
+    c: QuestionHashMap(key == "QUESTION_PLAYBOY", $val: val)
+    toAsk: Question(question == "QUESTION_PLAYBOY", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Gosling in love? yes"
+when
+	q: Question(question == "QUESTION_GOSLING_IN_LOVE", answer == "ANSWER_HEAD_OVER_HEELS")
+    c: QuestionHashMap(key == "RESULT_LARS_AND_THE_REAL_GIRL", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Gosling playboy"
+when
+	q: Question(question == "QUESTION_PLAYBOY", answer == "ANSWER_PLAYBOY_OK")
+    c: QuestionHashMap(key == "RESULT_CRAZY_STUPID_LOVE", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Gosling no playboy"
+when
+	q: Question(question == "QUESTION_PLAYBOY", answer == "ANSWER_PLAYBOY_NO")
+    c: QuestionHashMap(key == "RESULT_BLUE_VALENTINE", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "We are good"
+when
+	q: Question(question == "QUESTION_BREAKUP", answer == "ANSWER_GOOD")
+    c: QuestionHashMap(key == "QUESTION_WANT_TO_CRY", $val: val)
+    toAsk: Question(question == "QUESTION_WANT_TO_CRY", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Cry? no"
+when
+	q: Question(question == "QUESTION_WANT_TO_CRY", answer == "ANSWER_CRY_NO")
+    c: QuestionHashMap(key == "QUESTION_JULIA_ROBERTS", $val: val)
+    toAsk: Question(question == "QUESTION_JULIA_ROBERTS", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Cry? yes"
+when
+	q: Question(question == "QUESTION_WANT_TO_CRY", answer == "ANSWER_CRY_YES")
+    c: QuestionHashMap(key == "QUESTION_TALE", $val: val)
+    toAsk: Question(question == "QUESTION_TALE", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Tale modern"
+when
+	q: Question(question == "QUESTION_TALE", answer == "ANSWER_MODERN_ROMANCE")
+    c: QuestionHashMap(key == "RESULT_WHEN_HARRY_MET_SALLY", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Tale classic"
+when
+	q: Question(question == "QUESTION_TALE", answer == "ANSWER_CLASSIC_ROMANCE")
+    c: QuestionHashMap(key == "QUESTION_BLACK_AND_WHITE_FILM", $val: val)
+    toAsk: Question(question == "QUESTION_BLACK_AND_WHITE_FILM", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "BW Classic"
+when
+	q: Question(question == "QUESTION_BLACK_AND_WHITE_FILM", answer == "ANSWER_BW_CLASSIC")
+    c: QuestionHashMap(key == "RESULT_CASABLANCA", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "BW no thanks"
+when
+	q: Question(question == "QUESTION_BLACK_AND_WHITE_FILM", answer == "ANSWER_BW_NO")
+    c: QuestionHashMap(key == "RESULT_LOVE_STORY", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Julia yes"
+when
+	q: Question(question == "QUESTION_JULIA_ROBERTS", answer == "ANSWER_JULIA_YES")
+    c: QuestionHashMap(key == "QUESTION_MARRIAGE", $val: val)
+    toAsk: Question(question == "QUESTION_MARRIAGE", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "marriage no"
+when
+	q: Question(question == "QUESTION_MARRIAGE", answer == "ANSWER_MEET_CUTE")
+    c: QuestionHashMap(key == "RESULT_PRETTY_WOMAN", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "marriage yes"
+when
+	q: Question(question == "QUESTION_MARRIAGE", answer == "ANSWER_WEDDING")
+    c: QuestionHashMap(key == "RESULT_RUNAWAY_BRIDE", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Julia no"
+when
+	q: Question(question == "QUESTION_JULIA_ROBERTS", answer == "ANSWER_JULIA_NO")
+    c: QuestionHashMap(key == "QUESTION_RAT_PACK", $val: val)
+    toAsk: Question(question == "QUESTION_RAT_PACK", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Rat pack fan"
+when
+	q: Question(question == "QUESTION_RAT_PACK", answer == "ANSWER_RAT_PACK_YES")
+    c: QuestionHashMap(key == "QUESTION_MOLLY_RINGWALD", $val: val)
+    toAsk: Question(question == "QUESTION_MOLLY_RINGWALD", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "not a Rat pack fan"
+when
+	q: Question(question == "QUESTION_RAT_PACK", answer == "ANSWER_RAT_PACK_NO")
+    c: QuestionHashMap(key == "QUESTION_FEMALE_LEAD", $val: val)
+    toAsk: Question(question == "QUESTION_FEMALE_LEAD", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "it is a comedy"
+when
+	q: Question(question == "QUESTION_FEMALE_LEAD", answer == "ANSWER_CLUELESS")
+    c: QuestionHashMap(key == "QUESTION_CLASSIC_MODERN", $val: val)
+    toAsk: Question(question == "QUESTION_CLASSIC_MODERN", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "classic movie comedy"
+when
+	q: Question(question == "QUESTION_CLASSIC_MODERN", answer == "ANSWER_CLASSIC")
+    c: QuestionHashMap(key == "RESULT_BREAKFAST_AT_TIFFANY'S", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "modern movie comedy"
+when
+	q: Question(question == "QUESTION_CLASSIC_MODERN", answer == "ANSWER_MODERN_MOVIE")
+    c: QuestionHashMap(key == "QUESTION_HIGH_SCHOOL_INVOLVE", $val: val)
+    toAsk: Question(question == "QUESTION_HIGH_SCHOOL_INVOLVE", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "golden years"
+when
+	q: Question(question == "QUESTION_HIGH_SCHOOL_INVOLVE", answer == "ANSWER_CHEERS")
+    c: QuestionHashMap(key == "QUESTION_90S_CLASSIC", $val: val)
+    toAsk: Question(question == "QUESTION_90S_CLASSIC", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "90s classic"
+when
+	q: Question(question == "QUESTION_90S_CLASSIC", answer == "ANSWER_ABSOLUTELY")
+    c: QuestionHashMap(key == "RESULT_CLUELESS", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "90s lesser known"
+when
+	q: Question(question == "QUESTION_90S_CLASSIC", answer == "ANSWER_LESSER_KNOWN")
+    c: QuestionHashMap(key == "RESULT_NEVER_BEEN_KISSED", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "not relieve high school"
+when
+	q: Question(question == "QUESTION_HIGH_SCHOOL_INVOLVE", answer == "ANSWER_NO_RELIVE")
+    c: QuestionHashMap(key == "RESULT_13_GOING_ON_30", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "skip the ditz"
+when
+	q: Question(question == "QUESTION_FEMALE_LEAD", answer == "ANSWER_EMPOWERED")
+    c: QuestionHashMap(key == "QUESTION_BRANIAC", $val: val)
+    toAsk: Question(question == "QUESTION_BRANIAC", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "More lovable braniac"
+when
+	q: Question(question == "QUESTION_BRANIAC", answer == "ANSWER_LOVABLE")
+    c: QuestionHashMap(key == "RESULT_BRIDGET_JONES'S_DIARY", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Braniac"
+when
+	q: Question(question == "QUESTION_BRANIAC", answer == "ANSWER_SURE_BRAIN")
+    c: QuestionHashMap(key == "RESULT_SHE'S_ALL_THAT", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Democracy"
+when
+	q: Question(question == "QUESTION_MOLLY_RINGWALD", answer == "ANSWER_DEMOCRACY")
+    c: QuestionHashMap(key == "RESULT_BREAKFAST_CLUB", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Molly lead"
+when
+	q: Question(question == "QUESTION_MOLLY_RINGWALD", answer == "ANSWER_RINGWALD")
+    c: QuestionHashMap(key == "QUESTION_BIRTHDAY", $val: val)
+    toAsk: Question(question == "QUESTION_BIRTHDAY", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Molly birthday forgot"
+when
+	q: Question(question == "QUESTION_BIRTHDAY", answer == "ANSWER_FORGOT_BIRTHDAY")
+    c: QuestionHashMap(key == "RESULT_SIXTEEN_CANDLES", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Molly birthday not forgot"
+when
+	q: Question(question == "QUESTION_BIRTHDAY", answer == "ANSWER_NO_FORGOT_BIRTHDAY")
+    c: QuestionHashMap(key == "RESULT_PRETTY_IN_PINK", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Main squeeze"
+when
+	q: Question(question == "QUESTION_WITH_WHO", answer == "ANSWER_MAIN")
+    c: QuestionHashMap(key == "QUESTION_HE_ENJOYS_IT", $val: val)
+    toAsk: Question(question == "QUESTION_HE_ENJOYS_IT", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Dont care if he enjoys"
+when
+	q: Question(question == "QUESTION_HE_ENJOYS_IT", answer == "ANSWER_HE_NO")
+    c: QuestionHashMap(key == "RESULT_THE_NOTEBOOK", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Care if he enjoys"
+when
+	q: Question(question == "QUESTION_HE_ENJOYS_IT", answer == "ANSWER_HE_YES")
+    c: QuestionHashMap(key == "QUESTION_ACTION_COM", $val: val)
+    toAsk: Question(question == "QUESTION_ACTION_COM", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Love explosions"
+when
+	q: Question(question == "QUESTION_ACTION_COM", answer == "ANSWER_EXPLOSIONS")
+    c: QuestionHashMap(key == "QUESTION_MILITARY", $val: val)
+    toAsk: Question(question == "QUESTION_MILITARY", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "About face"
+when
+	q: Question(question == "QUESTION_MILITARY", answer == "ANSWER_ABOUT_FACE")
+    c: QuestionHashMap(key == "RESULT_TOP_GUN", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Not military fan"
+when
+	q: Question(question == "QUESTION_MILITARY", answer == "ANSWER_NO_MILITARY")
+    c: QuestionHashMap(key == "QUESTION_LEAD", $val: val)
+    toAsk: Question(question == "QUESTION_LEAD", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Male lead"
+when
+	q: Question(question == "QUESTION_LEAD", answer == "ANSWER_BOURNE")
+    c: QuestionHashMap(key == "RESULT_BOURNE_IDENTITY", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Female lead"
+when
+	q: Question(question == "QUESTION_LEAD", answer == "ANSWER_GIRL_POWER")
+    c: QuestionHashMap(key == "RESULT_MR._AND_MRS._SMITH", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Brains and beauty"
+when
+	q: Question(question == "QUESTION_ACTION_COM", answer == "ANSWER_BRAINS")
+    c: QuestionHashMap(key == "QUESTION_IT_GIRL", $val: val)
+    toAsk: Question(question == "QUESTION_IT_GIRL", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "It Girl "
+when
+	q: Question(question == "QUESTION_IT_GIRL", answer == "ANSWER_IT_GIRL_YES")
+    c: QuestionHashMap(key == "RESULT_SILVER_LININGS_PLAYBOOK", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "It Girl no"
+when
+	q: Question(question == "QUESTION_IT_GIRL", answer == "ANSWER_IT_GIRL_NO")
+    c: QuestionHashMap(key == "RESULT_ETERNAL_SUNSHINE_OF_THE_SPOTLESS_MIND", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "Com in romcom"
+when
+	q: Question(question == "QUESTION_ACTION_COM", answer == "ANSWER_ROMCOM")
+    c: QuestionHashMap(key == "QUESTION_JUDD_APATOW", $val: val)
+    toAsk: Question(question == "QUESTION_JUDD_APATOW", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Apatow"
+when
+	q: Question(question == "QUESTION_JUDD_APATOW", answer == "ANSWER_APATOW_YES")
+    c: QuestionHashMap(key == "QUESTION_MARRIAGE_THOUGHTS", $val: val)
+    toAsk: Question(question == "QUESTION_MARRIAGE_THOUGHTS", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "Not thinking about marriage"
+when
+	q: Question(question == "QUESTION_MARRIAGE_THOUGHTS", answer == "ANSWER_MARRIAGE_NO")
+    c: QuestionHashMap(key == "QUESTION_BROKEN_KNOCKED", $val: val)
+    toAsk: Question(question == "QUESTION_BROKEN_KNOCKED", $list: answers_to_question, answer == null)
+then
+	String question_value = $val;
+    Gui gui = new Gui(question_value, $list);
+    String result = gui.displayQuestion();
+    toAsk.setAnswer(result);
+    update(toAsk);
+end
+
+rule "thinking about marriage"
+when
+	q: Question(question == "QUESTION_MARRIAGE_THOUGHTS", answer == "ANSWER_MARRIAGE_YES")
+    c: QuestionHashMap(key == "RESULT_THIS_IS_40", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "humor in sorrow"
+when
+	q: Question(question == "QUESTION_BROKEN_KNOCKED", answer == "ANSWER_BROKEN")
+    c: QuestionHashMap(key == "RESULT_FORGETTING_SARAH_MARSHALL", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "knocked up"
+when
+	q: Question(question == "QUESTION_BROKEN_KNOCKED", answer == "ANSWER_KNOCKED")
+    c: QuestionHashMap(key == "RESULT_KNOCKED_UP", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+rule "No Apatow"
+when
+	q: Question(question == "QUESTION_JUDD_APATOW", answer == "ANSWER_APATOW_NO")
+    c: QuestionHashMap(key == "RESULT_I_LOVE_YOU_MAN", $val: val)
+then
+	Gui gui = new Gui($val, new HashMap<String, String>());
+	gui.displayQuestion();
+end
+
+

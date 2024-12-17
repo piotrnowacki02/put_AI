@@ -1,0 +1,108 @@
+ANSWER_MAIN;My main squeeze
+ANSWER_GIRLFREINDS;My girlfriends
+ANSWER_FAMILY;My family
+ANSWER_YES;YES
+ANSWER_NO;NO
+ANSWER_BURTON;What about Burton?
+ANSWER_PIXAR;Pixar
+ANSWER_DISNEY;Disney
+ANSWER_LOVER;Lover
+ANSWER_FIGHTER;Fighter
+ANSWER_ROBOTS;Robots
+ANSWER_HUMANS;Humans
+ANSWER_CHRISTMAS;I wish it was Christmas everyday
+ANSWER_NO_HOLIDAY;Not really
+ANSWER_CLASSICS;Always Love the classics
+ANSWER_MODERN;Maybe something more modern
+ANSWER_COMPLEX;I love complexity
+ANSWER_NO_COMPLEXITY;More than two and it's hard to follow
+ANSWER_KIDDIES;Something for the kiddies, please!
+ANSWER_TEENS;We have teens in the house
+ANSWER_BARF;My son will barf
+ANSWER_GIRLS;The girls would love that
+ANSWER_NEUTRAL;Something gender neutral
+ANSWER_TEACH;Let's teach them a thing or two
+ANSWER_EYE_ROLL;They roil their eyes at anything "old"
+ANSWER_COULD_WORK;That could work
+ANSWER_PASS_HIGH_SCHOOL;Pass
+ANSWER_NO_MUSICALS;Definitely no
+ANSWER_VON_TRAPP;We're basically the Von Trapp Family
+ANSWER_NO_KISS;Yes please!
+ANSWER_OK_KISS;A kiss isn't going to kill anyone
+ANSWER_GOOD;We're good
+ANSWER_NO_HEARTACHE;Let's avoid the heartache
+ANSWER_HUNKY_YES;Yes please!
+ANSWER_MYSTERY_MAN;I prefer a mystery man
+ANSWER_GOSLING_YES;Duh
+ANSWER_GOSLING_NO;Over him
+ANSWER_HEAD_OVER_HEELS;Yes
+ANSWER_GOSLING_ME;If it's not starring me then no
+ANSWER_PLAYBOY_OK;Ok
+ANSWER_PLAYBOY_NO;No, he's a family man
+ANSWER_INDIE;Indie
+ANSWER_CLASSIC_HUNK;Can't argue with a classic
+ANSWER_TOM_YES;Now you're talking
+ANSWER_TOM_NO;No way
+ANSWER_SINGER;I prefer a singer
+ANSWER_MOVES;I like a man with moves
+ANSWER_SWAYZE;Swayze
+ANSWER_BACON;Bacon
+ANSWER_TOM_80S;80s
+ANSWER_TOM_90S;90s
+ANSWER_BURTON_YES;Bring on the darkness!
+ANSWER_BURTON_NO;Something less morose
+ANSWER_NO_CRIMINAL;I like a bad guy, but not a criminal
+ANSWER_DANGER;I love danger
+ANSWER_INTERNATIONAL;Sure!
+ANSWER_AMERICA;America!
+ANSWER_VEGAS;Vegas!
+ANSWER_NYC;NYC
+ANSWER_CRY_YES;Load up on the waterproof mascara!
+ANSWER_CRY_NO;I'd rather not
+ANSWER_MODERN_ROMANCE;Modern day romance
+ANSWER_CLASSIC_ROMANCE;Classic romance
+ANSWER_CLASSIC_FILM;What's more classic?
+ANSWER_NO_BW_FILMS;No Thanks
+ANSWER_JULIA_YES;Yes
+ANSWER_JULIA_NO;No Thanks
+ANSWER_MEET_CUTE;More a fan of the meet cute
+ANSWER_WEDDING;Who doesn't love a wedding?
+ANSWER_RAT_PACK_YES;Duh
+ANSWER_RAT_PACK_NO;Who?
+ANSWER_CLUELESS;It is a comedy...
+ANSWER_EMPOWERED;Skip the ditz
+ANSWER_LOVABLE;A bit more lovable
+ANSWER_SURE_BRAIN;Sure!
+ANSWER_CLASSIC;Classic!
+ANSWER_MODERN_MOVIE;Modern!
+ANSWER_CHEERS;Cheers to the golden years
+ANSWER_NO_RELIVE;I'd rather not relive that
+ANSWER_LESSER_KNOWN;Maybe something lesser known
+ANSWER_ABSOLUTELY;Absolutely!
+ANSWER_RINGWALD;Always!
+ANSWER_DEMOCRACY;I prefer a democracy
+ANSWER_FORGOT_BIRTHDAY;Maybe?
+ANSWER_NO_FORGOT_BIRTHDAY;No Way!
+ANSWER_HE_YES;YES
+ANSWER_HE_NO;NO
+ANSWER_BRAINS;Brains & beauty!
+ANSWER_EXPLOSIONS;I love explosions!
+ANSWER_ROMCOM;Let's stick to the "com" in "romcom"
+ANSWER_NO_MILITARY;NO
+ANSWER_ABOUT_FACE;About face!
+ANSWER_GIRL_POWER;Girls have muscle, too!
+ANSWER_BOURNE;Bourne Identity
+ANSWER_IT_GIRL_YES;YES
+ANSWER_IT_GIRL_NO;NO
+ANSWER_APATOW_YES;Yes, please!
+ANSWER_APATOW_NO;Pass
+ANSWER_MARRIAGE_YES;Yes
+ANSWER_MARRIAGE_NO;Nah
+ANSWER_GIRL_ONLY;Girl Power!
+ANSWER_BROMANCE;Bromance is the best
+ANSWER_SMITTEN;She's smitten!
+ANSWER_UNAWARE;She may be a little unaware
+ANSWER_FAKE_NO;NO
+ANSWER_FAKE_YES;Ya man!
+ANSWER_BROKEN;There's humor in sorrow
+ANSWER_KNOCKED;I see where this is headed
